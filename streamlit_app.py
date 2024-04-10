@@ -49,9 +49,11 @@ with col1_container:
                 formatted_query = sqlparse.format(
                     processed_query, reindent=True, keyword_case="upper"
                 )
-                # Moved inside try-except to only display after successful query execution
-                col1_container.write("Consulta SQL Formateada:")
-                col1_container.code(formatted_query, language="sql")
+                # Displaying results in the second column
+                col1_container.write("Resultados de la Consulta:")
+                col1_container.dataframe(
+                    df
+                )  # Use dataframe instead of data_editor for broader compatibility
 
                 # Extract tables from the query and generate a DOT string for visualization
                 tables, joins = extract_tables(processed_query)
@@ -60,12 +62,12 @@ with col1_container:
                 # Render the relational map in the right column
                 col2_container.write("Diagrama relacional implicado:")
                 col2_container.graphviz_chart(dot_string, use_container_width=False)
+                # Moved inside try-except to only display after successful query execution
+                col2_container.write("Consulta SQL Formateada:")
+                col2_container.code(formatted_query, language="sql")
 
-                # Displaying results in the second column
-                col2_container.write("Resultados de la Consulta:")
-                col2_container.dataframe(
-                    df
-                )  # Use dataframe instead of data_editor for broader compatibility
+
+
 
                 # Exporting results to Excel and adding SQL query as a comment to the first cell
                 output = io.BytesIO()
