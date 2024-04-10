@@ -13,7 +13,7 @@ from src.functions import extract_tables, generate_graphviz_dot
 
 # Streamlit app setup
 st.set_page_config(layout="wide")
-st.header(":bar_chart: Example SQL, Excel & Relational Map :bar_chart:")
+st.header(":bar_chart: Example SQL querying, Relational Map and live interaction :bar_chart:")
 
 # Creating columns with custom spacing and borders
 col1, col2 = st.columns([0.4, 0.6])
