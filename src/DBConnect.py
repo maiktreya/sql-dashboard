@@ -2,7 +2,7 @@ import psycopg2
 import streamlit as st
 
 
-def get_db_connection():
+def get_connection():
     """
     Establishes and returns a connection to the database.
     """
