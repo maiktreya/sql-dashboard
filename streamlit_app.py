@@ -27,7 +27,10 @@ with col1_container:
     # User input for SQL query
     query = st.text_area(
         "Introduce la secuencia SQL a consultar",
-        value="select * from employees;",
+        value="""
+        SELECT employees.*, departments.department_name FROM employees
+        INNER JOIN departments ON employees.department_id = departments.department_id;
+        """,
         height=150,
     )
 
