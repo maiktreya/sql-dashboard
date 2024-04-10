@@ -6,7 +6,7 @@ import sqlparse
 import io
 
 # import connection parameters
-from src.DBConnect  import get_connection
+from src.DBConnect import get_connection
 
 # Import the refactored functions
 from src.functions import extract_tables, generate_graphviz_dot
@@ -54,7 +54,7 @@ with col1_container:
                 col1_container.code(formatted_query, language="sql")
 
                 # Extract tables from the query and generate a DOT string for visualization
-                tables, joins= extract_tables(processed_query)
+                tables, joins = extract_tables(processed_query)
                 dot_string = generate_graphviz_dot(tables, joins)
 
                 # Render the relational map in the right column
