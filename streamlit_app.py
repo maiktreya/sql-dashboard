@@ -30,7 +30,7 @@ with col1_container:
         value="""
         SELECT employees.*, departments.department_name, projects.project_name, projects.start_date, projects.end_date
         FROM employees INNER JOIN departments ON employees.department_id = departments.department_id INNER JOIN projects
-        ON departments.department_id = projects.department_id; order by last_name, first_name
+        ON departments.department_id = projects.department_id ORDER BY last_name, first_name
         """,
         height=150,
     )
