@@ -6,10 +6,10 @@ import sqlparse
 import io
 
 # import connection parameters
-from src.DBConnect  import get_connection
+from ..src.DBConnect  import get_connection
 
 # Import the refactored functions
-from src.functions import extract_tables, generate_graphviz_dot
+from ..src.functions import extract_tables, generate_graphviz_dot
 
 # Streamlit app setup
 st.set_page_config(layout="wide")
