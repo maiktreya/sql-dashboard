@@ -28,9 +28,10 @@ with col1_container:
     query = st.text_area(
         "Introduce la secuencia SQL a consultar",
         value="""
-        SELECT employees.*, departments.department_name, projects.project_name, projects.start_date, projects.end_date
-        FROM employees INNER JOIN departments ON employees.department_id = departments.department_id INNER JOIN projects
-        ON departments.department_id = projects.department_id ORDER BY last_name, first_name
+        SELECT e.*, d.department_name, STRING_AGG(p.project_name, ', ' ORDER BY p.project_name) AS project_names, STRING_AGG(p.start_date::text, ', '
+        ORDER BY p.start_date) AS project_start_dates, STRING_AGG(p.end_date::text, ', ' ORDER BY p.end_date) AS project_end_dates
+        FROM employees e JOIN departments d ON e.department_id = d.department_id LEFT JOIN projects p ON d.department_id = p.department_id
+        GROUP BY e.employee_id, d.department_id ORDER BY e.last_name, e.first_name;
         """,
         height=150,
     )
@@ -59,7 +60,7 @@ with col1_container:
 
                 # Render the relational map in the right column
                 col2_container.write("Diagrama relacional implicado:")
-                col2_container.graphviz_chart(dot_string, use_container_width=True)
+                col2_container.graphviz_chart(dot_string, use_container_width=False)
 
                 # Displaying results in the second column
                 col2_container.write("Resultados de la Consulta:")
