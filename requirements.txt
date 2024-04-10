@@ -1,3 +1,2 @@
-streamlit
 sqlparse
 psycopg2
