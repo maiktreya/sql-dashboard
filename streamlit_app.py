@@ -27,8 +27,7 @@ with col1_container:
     # User input for SQL query
     query = st.text_area(
         "Introduce la secuencia SQL a consultar",
-        value="""
-        SELECT e.*, d.department_name, STRING_AGG(p.project_name, ', ' ORDER BY p.project_name) AS project_names, STRING_AGG(p.start_date::text, ', '
+        value="""SELECT e.*, d.department_name, STRING_AGG(p.project_name, ', ' ORDER BY p.project_name) AS project_names, STRING_AGG(p.start_date::text, ', '
         ORDER BY p.start_date) AS project_start_dates, STRING_AGG(p.end_date::text, ', ' ORDER BY p.end_date) AS project_end_dates
         FROM employees e JOIN departments d ON e.department_id = d.department_id LEFT JOIN projects p ON d.department_id = p.department_id
         GROUP BY e.employee_id, d.department_id ORDER BY e.last_name, e.first_name;
