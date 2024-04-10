@@ -1,4 +1,4 @@
-# Streamlit frontend to query, analyze the relational diagram and offer a visual table and the possibility of xlsx export
+# Streamlit frontend to query, analyze the implied relational diagram and showcase a visual table & the possibility of CSV/xlsx export
 
 import streamlit as st
 import pandas as pd
