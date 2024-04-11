@@ -22,7 +22,6 @@ col1, col2 = st.columns([0.4, 0.6])
 col1_container = col1.container(border=True)
 col2_container = col2.container(border=True)
 
-
 with col1_container:
     # User input for SQL query
     query = st.text_area(
@@ -63,9 +62,6 @@ with col1_container:
                 # Moved inside try-except to only display after successful query execution
                 col2_container.write("Formatted SQL query:")
                 col2_container.code(formatted_query, language="sql")
-
-
-
 
                 # Exporting results to Excel and adding SQL query as a comment to the first cell
                 output = io.BytesIO()
