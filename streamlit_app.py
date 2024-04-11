@@ -26,7 +26,7 @@ col2_container = col2.container(border=True)
 with col1_container:
     # User input for SQL query
     query = st.text_area(
-        "Introduce la secuencia SQL a consultar",
+        "Write a SQL sentence:",
         value="""SELECT e.*, d.department_name, STRING_AGG(p.project_name, ', ' ORDER BY p.project_name) AS project_names, STRING_AGG(p.start_date::text, ', '
         ORDER BY p.start_date) AS project_start_dates, STRING_AGG(p.end_date::text, ', ' ORDER BY p.end_date) AS project_end_dates
         FROM employees e JOIN departments d ON e.department_id = d.department_id LEFT JOIN projects p ON d.department_id = p.department_id
@@ -35,7 +35,7 @@ with col1_container:
         height=150,
     )
 
-    if st.button("Ejecutar Consulta"):
+    if st.button("Execute query"):
         # Pre-process the query to remove trailing semicolons
         processed_query = query.rstrip(";")
 
@@ -49,21 +49,19 @@ with col1_container:
                 formatted_query = sqlparse.format(
                     processed_query, reindent=True, keyword_case="upper"
                 )
-                # Displaying results in the second column
-                col1_container.write("Resultados de la Consulta:")
-                col1_container.dataframe(
-                    df
-                )  # Use dataframe instead of data_editor for broader compatibility
+                # Displaying results in the first column
+                col1_container.write("Query results:")
+                col1_container.dataframe(df)
 
                 # Extract tables from the query and generate a DOT string for visualization
                 tables, joins = extract_tables(processed_query)
                 dot_string = generate_graphviz_dot(tables, joins)
 
                 # Render the relational map in the right column
-                col2_container.write("Diagrama relacional implicado:")
+                col2_container.write("Implied relational diagram:")
                 col2_container.graphviz_chart(dot_string, use_container_width=False)
                 # Moved inside try-except to only display after successful query execution
-                col2_container.write("Consulta SQL Formateada:")
+                col2_container.write("Formatted SQL query:")
                 col2_container.code(formatted_query, language="sql")
 
 
@@ -72,9 +70,9 @@ with col1_container:
                 # Exporting results to Excel and adding SQL query as a comment to the first cell
                 output = io.BytesIO()
                 with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
-                    df.to_excel(writer, index=False, sheet_name="Resultados")
+                    df.to_excel(writer, index=False, sheet_name="Results")
                     workbook = writer.book
-                    worksheet = writer.sheets["Resultados"]
+                    worksheet = writer.sheets["Results"]
                     worksheet.write_comment(
                         "A1",
                         "Query: " + formatted_query,
@@ -86,10 +84,10 @@ with col1_container:
 
                 # Download button for exporting results
                 col2_container.download_button(
-                    label="Descargar Excel",
+                    label="Download xlsx file",
                     data=output,
-                    file_name="resultados_consulta.xlsx",
+                    file_name="query_results.xlsx",
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 )
             except Exception as e:
-                st.error(f"Se produjo un error: {e}")
+                st.error(f"There was an error: {e}")
