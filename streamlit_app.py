@@ -16,7 +16,7 @@ st.set_page_config(layout="wide")
 st.header(":bar_chart: Example SQL querying, Relational Map & live interaction :bar_chart:")
 
 # Creating columns with custom spacing and borders
-col1, col2 = st.columns([0.4, 0.6])
+col1, col2 = st.columns([0.5, 0.5])
 
 # Adding a container to each column for better border control
 col1_container = col1.container(border=True)
