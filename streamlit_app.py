@@ -22,7 +22,7 @@ def run_query(query):
 
 def main():
     st.title('SQL Query and Export to Excel Tool')
-    
+
     # Text area for user to input SQL query
     query = st.text_area(
         "Write a SQL sentence:",
@@ -34,8 +34,12 @@ def main():
         height=150,
     )
 
-        # Provide download button if DataFrame is not empty
-        if not df.empty and st.button('Export to Excel'):
+    df = run_query(query)
+
+    # Provide download button if DataFrame is not empty
+    if not df.empty:
+        st.write(df)
+        if st.button('Export to Excel'):
             # Export DataFrame to Excel
             output = f"{pd.Timestamp('now').strftime('%Y-%m-%d_%H-%M-%S')}_output.xlsx"
             df.to_excel(output, index=False)
