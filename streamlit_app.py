@@ -43,7 +43,11 @@ with col1_container:
             try:
                 # Executing the processed query
                 df = pd.read_sql(processed_query, conn)
-
+                
+                # Trim spaces from string columns
+                for col in df.select_dtypes(include=['object']):  # 'object' usually means string in pandas
+                    df[col] = df[col].str.strip()
+                    
                 # Format the SQL query for display
                 formatted_query = sqlparse.format(
                     processed_query, reindent=True, keyword_case="upper"
