@@ -1,29 +1,29 @@
 # Streamlit frontend to query, analyze the implied relational diagram and showcase a visual table & the possibility of CSV/xlsx export
 
-import pandas as pd
 import streamlit as st
-from sqlalchemy import create_engine
+import pandas as pd
+import sqlparse
+import io
 
-# Function to create a connection to your SQL database
-def get_connection():
-    # Replace 'your_database_url' with your actual database connection URL or connection string
-    return create_engine('your_database_url')
+# import connection parameters
+from src.DBConnect import get_connection
 
-# Function to execute the SQL query and clean the DataFrame from leading/trailing spaces
-@st.cache
-def run_query(query):
-    engine = get_connection()
-    with engine.connect() as conn:
-        result = pd.read_sql_query(query, conn)
-        # Trim spaces from string columns
-        for col in result.select_dtypes(include=['object']):  # 'object' usually means string in pandas
-            result[col] = result[col].str.strip()
-        return result
+# Import the refactored functions
+from src.functions import extract_tables, generate_graphviz_dot
 
-def main():
-    st.title('SQL Query and Export to Excel Tool')
+# Streamlit app setup
+st.set_page_config(layout="wide")
+st.header(":bar_chart: Example SQL querying, Relational Map & live interaction :bar_chart:")
 
-    # Text area for user to input SQL query
+# Creating columns with custom spacing and borders
+col1, col2 = st.columns([0.5, 0.5])
+
+# Adding a container to each column for better border control
+col1_container = col1.container(border=True)
+col2_container = col2.container(border=True)
+
+with col1_container:
+    # User input for SQL query
     query = st.text_area(
         "Write a SQL sentence:",
         value="""SELECT e.*, d.department_name, STRING_AGG(p.project_name, ', ' ORDER BY p.project_name) AS project_names, STRING_AGG(p.start_date::text, ', '
@@ -34,16 +34,56 @@ def main():
         height=150,
     )
 
-    df = run_query(query)
+    if st.button("Execute query"):
+        # Pre-process the query to remove trailing semicolons
+        processed_query = query.rstrip(";")
 
-    # Provide download button if DataFrame is not empty
-    if not df.empty:
-        st.write(df)
-        if st.button('Export to Excel'):
-            # Export DataFrame to Excel
-            output = f"{pd.Timestamp('now').strftime('%Y-%m-%d_%H-%M-%S')}_output.xlsx"
-            df.to_excel(output, index=False)
-            st.success(f'Exported to {output}')
+        # Use the get_connection function to connect to the database
+        with get_connection() as conn:
+            try:
+                # Executing the processed query
+                df = pd.read_sql(processed_query, conn)
 
-if __name__ == "__main__":
-    main()
+                # Format the SQL query for display
+                formatted_query = sqlparse.format(
+                    processed_query, reindent=True, keyword_case="upper"
+                )
+                # Displaying results in the first column
+                col1_container.write("Query results:")
+                col1_container.dataframe(df)
+
+                # Extract tables from the query and generate a DOT string for visualization
+                tables, joins = extract_tables(processed_query)
+                dot_string = generate_graphviz_dot(tables, joins)
+
+                # Render the relational map in the right column
+                col2_container.write("Implied relational diagram:")
+                col2_container.graphviz_chart(dot_string, use_container_width=False)
+                # Moved inside try-except to only display after successful query execution
+                col2_container.write("Formatted SQL query:")
+                col2_container.code(formatted_query, language="sql")
+
+                # Exporting results to Excel and adding SQL query as a comment to the first cell
+                output = io.BytesIO()
+                with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
+                    df.to_excel(writer, index=False, sheet_name="Results")
+                    workbook = writer.book
+                    worksheet = writer.sheets["Results"]
+                    worksheet.write_comment(
+                        "A1",
+                        "Query: " + formatted_query,
+                        {"visible": True, "author": "SQL Query"},
+                    )
+                    worksheet.set_column("A:A", 20)
+
+                output.seek(0)  # Rewind the buffer
+
+                # Download button for exporting results
+                col2_container.download_button(
+                    label="Download xlsx file",
+                    data=output,
+                    file_name="query_results.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                )
+            except Exception as e:
+                st.error(f"There was an error: {e}")
