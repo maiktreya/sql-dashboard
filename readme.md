@@ -9,7 +9,7 @@ Minimal streamlit webapp showcasing a sql interface which allows retrieving data
 - An interactive data table to inspect the result
 - The capability of exporting the table both to csv or to xlsx
 
-Live interactive example at: https://sql-dashboard.streamlit.app/
+[Live interactive example](https://sql-dashboard.streamlit.app/)
 ----
 
 #### License
